@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CariTakip — Vadesi Geçen Alacak Takibi (Demo)</title>
+<meta name="description" content="Toptancılar için cari tahsilat takibi: vadesi geçen faturalar, yaşlandırma, tek tıkla nazik WhatsApp bilgilendirmesi ve ekstre. Demo.">
+<meta name="robots" content="noindex">
+<style>
+:root{
+  --bg:#f4f6f9;--card:#fff;--ink:#141821;--mute:#5b6372;--line:#e2e6ec;
+  --brand:#0f6e6e;--ok:#1e7d45;--ok-bg:#e6f4ec;--warn:#9a6200;--warn-bg:#fff4dc;
+  --late:#b3261e;--late-bg:#fdecea;--soon:#1d5fa8;--soon-bg:#e7f0fb;--wa:#1fa855;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:inherit}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.bar{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:18px;display:flex;align-items:center;gap:8px}
+.logo i{width:26px;height:26px;border-radius:7px;background:var(--brand);display:inline-grid;place-items:center;color:#fff;font-style:normal;font-size:14px}
+.demo-tag{font-size:12px;background:var(--warn-bg);color:var(--warn);padding:2px 8px;border-radius:99px;font-weight:600}
+nav{display:flex;gap:4px;overflow-x:auto;max-width:1080px;margin:0 auto;padding:0 16px 8px}
+nav button{border:0;background:none;padding:8px 12px;border-radius:8px;font:inherit;font-weight:600;color:var(--mute);cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--ink);color:#fff}
+main{max-width:1080px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:4px 0 4px}h2{font-size:17px;margin:0 0 10px}
+.sub{color:var(--mute);margin:0 0 16px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+@media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi b{display:block;font-size:24px;line-height:1.15}
+.kpi span{color:var(--mute);font-size:13px}
+.kpi.late b{color:var(--late)}.kpi.warn b{color:var(--warn)}.kpi.ok b{color:var(--ok)}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.b-late{background:var(--late-bg);color:var(--late)}.b-warn{background:var(--warn-bg);color:var(--warn)}
+.b-soon{background:var(--soon-bg);color:var(--soon)}.b-ok{background:var(--ok-bg);color:var(--ok)}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 12px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
+.btn.p{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.wa{background:var(--wa);border-color:var(--wa);color:#fff}
+.btn.s{padding:5px 9px;font-size:13px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sp{flex:1}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+td.n,th.n{text-align:right;white-space:nowrap}
+.tw{overflow-x:auto}
+.cust{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.cust:last-child{border-bottom:0}
+.cust .info{flex:1;min-width:0}
+.cust .info b{display:block}
+.aging{display:flex;height:14px;border-radius:99px;overflow:hidden;background:#e9edf2;margin:8px 0 6px}
+.aging i{display:block;height:100%}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:13px}
+.leg span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;background:var(--c)}
+@media(max-width:600px){
+  nav{flex-wrap:wrap;overflow:visible}
+  nav button{padding:6px 10px;font-size:14px}
+  .hm{display:none}
+  th,td{padding:8px 5px}
+  .cust.due{flex-direction:column}
+  .cust.due .act{text-align:left!important;width:100%}
+  .cust.due .act .row{justify-content:flex-start!important}
+}
+.mute{color:var(--mute)}.small{font-size:13px}
+input,select,textarea{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;width:100%}
+textarea{min-height:90px}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+.drop{border:2px dashed #c4c9d2;border-radius:12px;padding:28px;text-align:center;background:#fafbfc;cursor:pointer}
+.drop.over{border-color:var(--brand);background:#f0f8f8}
+.hide{display:none!important}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-weight:600;z-index:20}
+.ekstre{max-width:560px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px}
+.ekstre .top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:10px}
+.tot td{font-weight:800;border-bottom:0}
+.msg{white-space:pre-wrap;background:#f3f8f3;border:1px solid #d6e8d9;border-radius:10px;padding:10px;font-size:14px}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="logo"><i>₺</i>CariTakip</div>
+    <span class="demo-tag">DEMO — örnek veri</span>
+    <span class="sp"></span>
+    <span class="small mute" id="firmaTop"></span>
+  </div>
+  <nav id="nav">
+    <button data-v="panel" class="on">Panel</button>
+    <button data-v="vade">Vadesi Geçenler</button>
+    <button data-v="cari">Cariler</button>
+    <button data-v="aktar">Excel'den Aktar</button>
+    <button data-v="ayar">Ayarlar</button>
+  </nav>
+</header>
+<main id="app"></main>
+<div id="toast" class="toast hide"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const bugun = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+const iso = d => { const x = new Date(d); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"); };
+const fmt = d => d ? new Date(d).toLocaleDateString("tr-TR", {day:"2-digit", month:"2-digit", year:"numeric"}) : "—";
+const tl = n => (Math.round(n * 100) / 100).toLocaleString("tr-TR", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ₺";
+const tlk = n => Math.round(n).toLocaleString("tr-TR") + " ₺";
+const gunFark = d => Math.round((bugun() - new Date(d)) / 864e5);
+function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.remove("hide"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.add("hide"), 2200); }
+const store = {
+  get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+function telNorm(t){ let d = String(t || "").replace(/\D/g, ""); if (d.length === 10 && d[0] === "5") d = "90" + d; else if (d.length === 11 && d[0] === "0") d = "9" + d; return d; }
+
+/* ---------- ayarlar ---------- */
+const TONLAR = {
+  nazik: "Merhaba {yetkili}, iyi çalışmalar.\n{firma} olarak hesap ekstrenizi bilginize sunuyoruz. Vadesi geçmiş görünen {adet} belge toplam {tutar}:\n{belgeler}\n\nÖdemeyi yaptıysanız bu mesajı dikkate almayın, kayıtlarımızı güncelleyelim. Mutabakat için ekstreyi kontrol edebilirsiniz.\n{iban}\nTeşekkür ederiz.",
+  kisa: "Merhaba {yetkili}, {firma} cari ekstreniz: vadesi geçen {adet} belge, toplam {tutar}.\n{belgeler}\n{iban}\nÖdeme yaptıysanız dikkate almayın. İyi çalışmalar."
+};
+const DEF_AYAR = { firma: "Örnek Gıda Toptan", iban: "IBAN: TR00 0000 0000 0000 0000 0000 00 (Örnek Gıda Toptan)", esik: 7, ton: "nazik", sablon: TONLAR.nazik };
+let AYAR = Object.assign({}, DEF_AYAR, store.get("ct_ayar") || {});
+
+/* ---------- örnek veri ---------- */
+function ornekVeri(){
+  const ad = [["Yıldız Market","Hakan Bey"],["Kardeş Bakkal","Mehmet Bey"],["Ece Şarküteri","Ece Hanım"],["Öz Ekmek Fırını","Ali Bey"],["Lezzet Restoran","Serkan Bey"],["Mavi Kafe","Derya Hanım"],["Güven Market","Osman Bey"],["Doğa Manav","Kemal Bey"],["Can Büfe","Can Bey"],["Akdeniz Otel Mutfak","Selin Hanım"],["Pınar Pastanesi","Pınar Hanım"],["Toros Kasap","Yusuf Bey"],["Kampüs Kantin","Emre Bey"],["Sahil Balık Lokantası","Murat Bey"],["Ada Süpermarket","Burak Bey"]];
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const cariler = ad.map(([a, y], i) => ({ id: "C"+(101+i), ad: a, yetkili: y, tel: "0533 000 02 " + String(10+i) }));
+  const belgeler = []; let no = 4100;
+  cariler.forEach((c, i) => {
+    const adet = 2 + Math.floor(rnd() * 4);
+    for (let k = 0; k < adet; k++){
+      const yas = Math.floor(rnd() * 120) - 20;           // vadeye göre gün (eksi = vadesi gelmedi)
+      const vade = new Date(bugun() - yas * 864e5);
+      const tarih = new Date(vade - 30 * 864e5);
+      const tutar = Math.round((2000 + rnd() * 38000) / 10) * 10;
+      const odenen = i % 5 === 0 ? tutar : (rnd() < .3 ? Math.round(tutar * .4 / 10) * 10 : 0);
+      belgeler.push({ id: "F"+(no++), cari: c.id, no: "FTR" + no, tarih: iso(tarih), vade: iso(vade), tutar, odenen });
+    }
+  });
+  return { cariler, belgeler, hatirlatma: {} };
+}
+let DB = store.get("ct_db") || ornekVeri();
+const kaydet = () => { store.set("ct_db", DB); store.set("ct_ayar", AYAR); };
+const cari = id => DB.cariler.find(c => c.id === id);
+const kalan = b => Math.max(0, b.tutar - b.odenen);
+const acikBelgeler = cid => DB.belgeler.filter(b => b.cari === cid && kalan(b) > 0).sort((a, b) => a.vade.localeCompare(b.vade));
+const gecmis = cid => acikBelgeler(cid).filter(b => gunFark(b.vade) > 0);
+const toplam = arr => arr.reduce((s, b) => s + kalan(b), 0);
+const sonHat = cid => DB.hatirlatma[cid];
+function hatirlatildi(cid){ DB.hatirlatma[cid] = iso(bugun()); kaydet(); }
+window.hatirlatildi = hatirlatildi;
+function yasKova(g){ return g <= 30 ? 0 : g <= 60 ? 1 : 2; }
+
+function waLink(c){
+  const g = gecmis(c.id);
+  const msg = AYAR.sablon
+    .replaceAll("{yetkili}", c.yetkili || c.ad).replaceAll("{firma}", AYAR.firma).replaceAll("{cari}", c.ad)
+    .replaceAll("{adet}", g.length).replaceAll("{tutar}", tl(toplam(g)))
+    .replaceAll("{belgeler}", g.map(b => `• ${b.no} · vade ${fmt(b.vade)} · ${tl(kalan(b))}`).join("\n"))
+    .replaceAll("{iban}", AYAR.iban || "");
+  const tel = telNorm(c.tel);
+  const gercek = tel.length === 12 && !/^90533000/.test(tel);
+  return (gercek ? "https://wa.me/" + tel : "https://wa.me/") + "?text=" + encodeURIComponent(msg);
+}
+
+/* ---------- görünümler ---------- */
+const V = {};
+V.panel = () => {
+  const acik = DB.belgeler.filter(b => kalan(b) > 0);
+  const gec = acik.filter(b => gunFark(b.vade) > 0);
+  const kova = [0,0,0]; gec.forEach(b => kova[yasKova(gunFark(b.vade))] += kalan(b));
+  const top = kova[0] + kova[1] + kova[2] || 1;
+  const yaklasan = acik.filter(b => { const g = gunFark(b.vade); return g <= 0 && g > -8; });
+  const cariGec = DB.cariler.map(c => ({ c, t: toplam(gecmis(c.id)), en: Math.max(0, ...gecmis(c.id).map(b => gunFark(b.vade))) })).filter(x => x.t > 0).sort((a, b) => b.t - a.t);
+  return `
+  <h1>Alacak durumu</h1><p class="sub">${esc(AYAR.firma)} · ${fmt(bugun())}</p>
+  <div class="grid kpis">
+    <div class="card kpi late"><b>${tlk(toplam(gec))}</b><span>Vadesi geçmiş alacak</span></div>
+    <div class="card kpi warn"><b>${cariGec.length}</b><span>Vadesi geçmiş borcu olan cari</span></div>
+    <div class="card kpi"><b>${tlk(toplam(yaklasan))}</b><span>7 gün içinde vadesi gelen</span></div>
+    <div class="card kpi"><b>${tlk(toplam(acik))}</b><span>Toplam açık alacak</span></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h2>Yaşlandırma (vadesi geçenler)</h2>
+    <div class="aging"><i style="width:${kova[0]/top*100}%;background:#e9a23b"></i><i style="width:${kova[1]/top*100}%;background:#d9622b"></i><i style="width:${kova[2]/top*100}%;background:#b3261e"></i></div>
+    <div class="leg"><span style="--c:#e9a23b">0–30 gün: <b>${tlk(kova[0])}</b></span><span style="--c:#d9622b">31–60 gün: <b>${tlk(kova[1])}</b></span><span style="--c:#b3261e">60+ gün: <b>${tlk(kova[2])}</b></span></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="row"><h2 style="margin:0">En yüksek vadesi geçmiş bakiye</h2><span class="sp"></span><button class="btn s" onclick="go('vade')">Tümü →</button></div>
+    <div class="tw"><table><thead><tr><th>Cari</th><th class="n">Geciken</th><th class="n hm">En eski</th><th class="hm">Son WhatsApp</th></tr></thead><tbody>
+    ${cariGec.slice(0, 8).map(x => `<tr><td><a href="javascript:void 0" onclick="acik='${x.c.id}';go('cari')">${esc(x.c.ad)}</a></td><td class="n"><b>${tlk(x.t)}</b></td>
+      <td class="n hm"><span class="badge ${x.en > 60 ? "b-late" : x.en > 30 ? "b-warn" : "b-soon"}">${x.en} gün</span></td>
+      <td class="hm">${sonHat(x.c.id) ? fmt(sonHat(x.c.id)) : '<span class="mute">—</span>'}</td></tr>`).join("") || `<tr><td colspan="4" class="mute">Vadesi geçmiş alacak yok. 🎉</td></tr>`}
+    </tbody></table></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h2>Nasıl çalışır?</h2>
+    <ol class="small" style="margin:0;padding-left:18px">
+      <li>Muhasebe programınızdan aldığınız cari / fatura listesini <b>Excel'den Aktar</b> ile yükleyin.</li>
+      <li><b>Vadesi Geçenler</b> ekranı kimin ne kadar, kaç gündür geciktiğini sıralar.</li>
+      <li>Tek tıkla WhatsApp: belge listesi, toplam ve IBAN'ınızla <b>bilgi/ekstre tonunda</b> nazik mesaj hazır. Gönder tuşuna siz basarsınız.</li>
+      <li>Cari isterse ekstreyi açıp mutabakat yapar; ödeme geldiğinde Excel'i tekrar yüklemeniz yeterli.</li>
+    </ol>
+  </div>`;
+};
+
+V.vade = () => {
+  const esik = +AYAR.esik || 0;
+  const list = DB.cariler.map(c => ({ c, g: gecmis(c.id) })).filter(x => x.g.length)
+    .map(x => ({ ...x, en: Math.max(...x.g.map(b => gunFark(b.vade))), t: toplam(x.g) })).sort((a, b) => b.en - a.en);
+  return `
+  <h1>Vadesi Geçenler</h1><p class="sub">${list.length} cari · Bilgilendirme önerisi vadeden ${esik} gün sonra başlar (Ayarlar'dan değişir).</p>
+  <div class="card">
+  ${list.map(x => { const sh = sonHat(x.c.id), hazir = x.en >= esik;
+    return `<div class="cust due">
+      <div class="info"><b>${esc(x.c.ad)}</b>
+        <div class="small mute">${esc(x.c.yetkili)} · ${esc(x.c.tel)} · ${x.g.length} belge${sh ? " · son WhatsApp " + fmt(sh) : ""}</div>
+        <div class="small" style="margin-top:4px">${x.g.map(b => `${esc(b.no)} <span class="mute">(${gunFark(b.vade)} gün)</span>`).join(" · ")}</div>
+      </div>
+      <div class="act" style="text-align:right">
+        <b>${tl(x.t)}</b> <span class="badge ${x.en > 60 ? "b-late" : x.en > 30 ? "b-warn" : "b-soon"}">${x.en} gün</span>
+        <div class="row" style="margin-top:8px;justify-content:flex-end">
+          <a class="btn wa s" target="_blank" rel="noopener" href="${waLink(x.c)}" onclick="hatirlatildi('${x.c.id}');setTimeout(render,300)">${hazir ? "WhatsApp bilgilendir" : "Erken bilgilendir"}</a>
+          <a class="btn s" href="#ekstre/${esc(x.c.id)}">Ekstre</a>
+          <button class="btn s" onclick="odemeAl('${x.c.id}')">Ödendi</button>
+        </div>
+      </div>
+    </div>`; }).join("") || '<p class="mute">Vadesi geçmiş alacak yok. 🎉</p>'}
+  </div>`;
+};
+window.odemeAl = cid => { gecmis(cid).forEach(b => b.odenen = b.tutar); kaydet(); toast("Vadesi geçenler ödendi olarak işaretlendi"); render(); };
+
+let acik = null;
+V.cari = () => {
+  const c = acik && cari(acik);
+  if (c){
+    const bs = DB.belgeler.filter(b => b.cari === c.id).sort((a, b) => b.vade.localeCompare(a.vade));
+    return `
+    <div class="row"><button class="btn s" onclick="acik=null;render()">← Cariler</button><span class="sp"></span>
+      <a class="btn s" href="#ekstre/${esc(c.id)}">Ekstre</a>
+      ${gecmis(c.id).length ? `<a class="btn wa s" target="_blank" rel="noopener" href="${waLink(c)}" onclick="hatirlatildi('${c.id}')">WhatsApp</a>` : ""}</div>
+    <h1 style="margin-top:12px">${esc(c.ad)}</h1><p class="sub">${esc(c.yetkili)} · ${esc(c.tel)}</p>
+    <div class="grid kpis"><div class="card kpi"><b>${tlk(toplam(acikBelgeler(c.id)))}</b><span>Açık bakiye</span></div>
+      <div class="card kpi late"><b>${tlk(toplam(gecmis(c.id)))}</b><span>Vadesi geçmiş</span></div></div>
+    <div class="card tw" style="margin-top:12px"><table><thead><tr><th>Belge</th><th class="hm">Tarih</th><th>Vade</th><th class="n">Tutar</th><th class="n">Kalan</th></tr></thead><tbody>
+    ${bs.map(b => { const g = gunFark(b.vade), k = kalan(b);
+      return `<tr><td>${esc(b.no)}</td><td class="hm">${fmt(b.tarih)}</td><td>${fmt(b.vade)} ${k > 0 && g > 0 ? `<span class="badge b-late">${g} gün</span>` : k === 0 ? '<span class="badge b-ok">Kapandı</span>' : ""}</td>
+      <td class="n">${tl(b.tutar)}</td><td class="n"><b>${tl(k)}</b></td></tr>`; }).join("")}
+    </tbody></table></div>`;
+  }
+  return `
+  <h1>Cariler</h1><p class="sub">${DB.cariler.length} cari</p>
+  <input placeholder="Cari ara…" oninput="cFiltre(this.value)" style="margin-bottom:12px">
+  <div class="card" id="cliste">${cSatir("")}</div>`;
+};
+function cSatir(q){
+  q = q.toLocaleLowerCase("tr");
+  return DB.cariler.filter(c => !q || c.ad.toLocaleLowerCase("tr").includes(q)).map(c => { const g = toplam(gecmis(c.id)), a = toplam(acikBelgeler(c.id));
+    return `<div class="cust" style="cursor:pointer" onclick="acik='${c.id}';render()">
+      <div class="info"><b>${esc(c.ad)}</b><div class="small mute">${esc(c.yetkili)} · açık bakiye ${tlk(a)}</div></div>
+      ${g ? `<span class="badge b-late">${tlk(g)} gecikmiş</span>` : `<span class="badge b-ok">Gecikme yok</span>`}</div>`; }).join("") || '<p class="mute">Sonuç yok.</p>';
+}
+window.cFiltre = q => { $("#cliste").innerHTML = cSatir(q); };
+
+/* Cariye gösterilecek ekstre */
+function ekstreSayfa(id){
+  const c = cari(id);
+  if (!c) return `<div class="ekstre">Bu ekstre bulunamadı. <a href="#">Panele dön</a></div>`;
+  const bs = acikBelgeler(c.id);
+  return `
+  <p class="small" style="max-width:560px;margin:0 auto 8px"><a href="javascript:void 0" onclick="go('panel')">← Panele dön (demo)</a></p>
+  <div class="ekstre">
+    <div class="top"><div><div class="small mute">Cari hesap ekstresi</div><b style="font-size:18px">${esc(AYAR.firma)}</b></div>
+      <div style="text-align:right"><div class="small mute">Sayın</div><b>${esc(c.ad)}</b><div class="small mute">${fmt(bugun())} itibarıyla</div></div></div>
+    <div class="tw"><table><thead><tr><th>Belge</th><th>Vade</th><th class="n">Kalan</th></tr></thead><tbody>
+    ${bs.map(b => `<tr><td>${esc(b.no)}<div class="small mute">${fmt(b.tarih)}</div></td><td>${fmt(b.vade)}${gunFark(b.vade) > 0 ? ' <span class="badge b-late">vadesi geçti</span>' : ""}</td><td class="n">${tl(kalan(b))}</td></tr>`).join("")}
+    <tr class="tot"><td colspan="2">Açık bakiye</td><td class="n">${tl(toplam(bs))}</td></tr></tbody></table></div>
+    <p class="small">${esc(AYAR.iban)}</p>
+    <p class="small mute">Kayıtlarınızla farklılık varsa lütfen bize bildirin; mutabakat sağlayalım.</p>
+  </div>`;
+}
+
+/* Excel içe aktarma — dosya tarayıcıdan çıkmaz */
+let onizleme = null;
+V.aktar = () => `
+  <h1>Excel'den Aktar</h1>
+  <p class="sub">Muhasebe programınızdan (Logo, Mikro, Luca, Excel…) aldığınız açık fatura / cari listesini yükleyin. Satır başına bir belge: cari, telefon, belge no, tarih, vade, tutar, ödenen. Dosya bu demoda bilgisayarınızdan çıkmaz.</p>
+  <div class="card">
+    <div class="drop" id="drop" onclick="$('#dosya').click()"><b>Excel dosyasını buraya bırakın</b><div class="small mute">ya da tıklayıp seçin (.xlsx, .xls, .csv)</div></div>
+    <input type="file" id="dosya" accept=".xlsx,.xls,.csv" class="hide">
+    <div class="row" style="margin-top:10px"><span class="small mute">Elinizde hazır dosya yok mu?</span><button class="btn s" onclick="ornekExcel()">Örnek Excel indir</button></div>
+    <div id="onz" style="margin-top:14px"></div>
+  </div>`;
+const ESLE = {
+  cari: ["cari","cari adı","cari unvan","unvan","ünvan","müşteri","musteri","firma","hesap adı"],
+  yetkili: ["yetkili","ilgili","kişi"],
+  tel: ["telefon","tel","gsm","cep","whatsapp"],
+  no: ["belge no","fatura no","evrak no","belge","fatura","fiş no"],
+  tarih: ["tarih","fatura tarihi","belge tarihi"],
+  vade: ["vade","vade tarihi","son ödeme"],
+  tutar: ["tutar","borç","borc","fatura tutarı","toplam"],
+  odenen: ["ödenen","odenen","tahsil edilen","tahsilat"]
+};
+function sutunBul(bas){
+  const norm = s => String(s).toLocaleLowerCase("tr").trim(); const r = {}, kul = new Set();
+  for (const [alan, adlar] of Object.entries(ESLE)){         // önce tam eşleşme
+    const i = bas.findIndex((b, j) => !kul.has(j) && adlar.includes(norm(b)));
+    if (i >= 0){ r[alan] = i; kul.add(i); }
+  }
+  for (const [alan, adlar] of Object.entries(ESLE)){         // sonra kısmi, kullanılmamış sütunlarda
+    if (r[alan] != null) continue;
+    const i = bas.findIndex((b, j) => !kul.has(j) && adlar.some(a => a.length > 3 && norm(b).includes(a)));
+    if (i >= 0){ r[alan] = i; kul.add(i); }
+  }
+  return r;
+}
+function tarihCoz(v){
+  if (v instanceof Date && !isNaN(v)) return iso(v);
+  const s = String(v || "").trim(); let m;
+  if ((m = s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/))){ const d = new Date(+m[3], +m[2]-1, +m[1]); return d.getDate() === +m[1] && d.getMonth() === +m[2]-1 ? iso(d) : null; }
+  if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))){ const d = new Date(+m[1], +m[2]-1, +m[3]); return d.getMonth() === +m[2]-1 ? iso(d) : null; }
+  return null;
+}
+function sayiCoz(v){
+  if (typeof v === "number") return v;
+  let s = String(v || "").replace(/[^\d,.-]/g, "");
+  if (!s) return 0;
+  if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");          // 1.250,50
+  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");          // 1.250
+  const n = parseFloat(s); return isNaN(n) ? 0 : n;
+}
+function dosyaOku(f){
+  if (typeof XLSX === "undefined"){ toast("Excel okuyucu yüklenemedi"); return; }
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array", cellDates: true });
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: "" }).filter(r => r.some(c => c !== ""));
+      if (rows.length < 2){ toast("Dosyada satır bulunamadı"); return; }
+      const bas = rows[0], es = sutunBul(bas);
+      const eksik = ["cari","vade","tutar"].filter(k => es[k] == null);
+      if (eksik.length){ $("#onz").innerHTML = `<p><span class="badge b-late">Bulunamayan sütun: ${eksik.join(", ")}</span> <span class="small mute">İlk satırda "Cari", "Vade" ve "Tutar" başlıkları olmalı.</span></p>`; return; }
+      const al = (r, k) => es[k] != null ? r[es[k]] : "";
+      let tarihsiz = 0;
+      onizleme = rows.slice(1).map(r => {
+        const vade = tarihCoz(al(r, "vade")); if (!vade) tarihsiz++;
+        return { cari: String(al(r, "cari")).trim(), yetkili: String(al(r, "yetkili")).trim(), tel: String(al(r, "tel")).trim(), no: String(al(r, "no")).trim(),
+          tarih: tarihCoz(al(r, "tarih")) || vade, vade, tutar: sayiCoz(al(r, "tutar")), odenen: sayiCoz(al(r, "odenen")) };
+      }).filter(k => k.cari && k.tutar > 0);
+      const gecerli = onizleme.filter(k => k.vade); const cs = new Set(gecerli.map(k => k.cari)).size;
+      if (!gecerli.length){ onizleme = null; $("#onz").innerHTML = '<p><span class="badge b-late">Aktarılacak geçerli belge bulunamadı</span> <span class="small mute">Cari, vade (31.12.2026) ve tutar dolu satır gerekli.</span></p>'; return; }
+      $("#onz").innerHTML = `<p><b>${gecerli.length}</b> belge, <b>${cs}</b> cari bulundu.</p>
+        <p class="small">Tanınan sütunlar: ${Object.keys(es).map(k => `<span class="badge b-ok">${esc(bas[es[k]])} → ${k}</span>`).join(" ")}</p>
+        ${tarihsiz ? `<p class="small"><span class="badge b-warn">${tarihsiz} satırda vade tarihi okunamadı</span> <span class="mute">— bu satırlar alınmaz (biçim: 31.12.2026).</span></p>` : ""}
+        <div class="tw"><table><thead><tr><th>Cari</th><th>Belge</th><th>Vade</th><th class="n">Tutar</th></tr></thead><tbody>
+        ${gecerli.slice(0, 8).map(k => `<tr><td>${esc(k.cari)}</td><td>${esc(k.no)}</td><td>${fmt(k.vade)}</td><td class="n">${tl(k.tutar)}</td></tr>`).join("")}</tbody></table></div>
+        ${gecerli.length > 8 ? `<p class="small mute">… ve ${gecerli.length - 8} satır daha</p>` : ""}
+        <div class="row" style="margin-top:10px"><button class="btn p" onclick="aktarOnayla()">Örnek veriyi sil, benimkini yükle</button></div>`;
+      onizleme = gecerli;
+    } catch (err){ toast("Dosya okunamadı"); }
+  };
+  r.readAsArrayBuffer(f);
+}
+window.aktarOnayla = () => {
+  if (!onizleme || !onizleme.length) return;
+  const yeni = { cariler: [], belgeler: [], hatirlatma: {} }, idx = {};
+  onizleme.forEach((k, i) => {
+    const key = k.cari.toLocaleLowerCase("tr");
+    if (!idx[key]){ idx[key] = "C" + (500 + yeni.cariler.length); yeni.cariler.push({ id: idx[key], ad: k.cari, yetkili: k.yetkili, tel: k.tel }); }
+    else { const c = yeni.cariler.find(c => c.id === idx[key]); if (!c.tel && k.tel) c.tel = k.tel; if (!c.yetkili && k.yetkili) c.yetkili = k.yetkili; }
+    yeni.belgeler.push({ id: "F" + i, cari: idx[key], no: k.no || "Belge " + (i + 1), tarih: k.tarih, vade: k.vade, tutar: k.tutar, odenen: Math.min(k.odenen, k.tutar) });
+  });
+  DB = yeni; const n = onizleme.length; onizleme = null; kaydet(); toast(n + " belge aktarıldı"); go("vade");
+};
+window.ornekExcel = () => {
+  if (typeof XLSX === "undefined"){ toast("Excel yazıcı yüklenemedi"); return; }
+  const rows = [["Cari Unvan","Yetkili","Telefon","Belge No","Tarih","Vade","Tutar","Ödenen"]];
+  DB.belgeler.forEach(b => { const c = cari(b.cari); rows.push([c.ad, c.yetkili, c.tel, b.no, fmt(b.tarih), fmt(b.vade), b.tutar, b.odenen]); });
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), "Açık Faturalar");
+  XLSX.writeFile(wb, "ornek-cari-ekstre.xlsx");
+};
+
+V.ayar = () => `
+  <h1>Ayarlar</h1>
+  <div class="two">
+    <div class="card"><h2>Firma</h2>
+      <label>Firma adı</label><input id="a_f" value="${esc(AYAR.firma)}">
+      <label>Mesajın sonuna eklenecek IBAN satırı</label><input id="a_i" value="${esc(AYAR.iban)}">
+      <label>Vadeden kaç gün sonra bilgilendirilsin?</label><input id="a_e" type="number" min="0" max="90" value="${AYAR.esik}">
+    </div>
+    <div class="card"><h2>WhatsApp metni</h2>
+      <label>Ton</label><select id="a_t" onchange="$('#a_s').value = TONLAR[this.value]">
+        <option value="nazik" ${AYAR.ton === "nazik" ? "selected" : ""}>Nazik — ekstre bilgilendirmesi</option>
+        <option value="kisa" ${AYAR.ton === "kisa" ? "selected" : ""}>Kısa</option></select>
+      <p class="small mute">Alanlar: {yetkili} {cari} {firma} {adet} {tutar} {belgeler} {iban}</p>
+      <textarea id="a_s" rows="9">${esc(AYAR.sablon)}</textarea>
+      <div class="row" style="margin-top:12px"><button class="btn p" onclick="ayarKaydet()">Kaydet</button><span class="sp"></span><button class="btn s" onclick="sifirla()">Demo verisini sıfırla</button></div>
+    </div>
+  </div>`;
+window.TONLAR = TONLAR;
+window.ayarKaydet = () => {
+  AYAR.firma = $("#a_f").value.trim() || DEF_AYAR.firma; AYAR.iban = $("#a_i").value.trim();
+  AYAR.esik = Math.min(90, Math.max(0, +$("#a_e").value || 0)); AYAR.ton = $("#a_t").value;
+  AYAR.sablon = $("#a_s").value || TONLAR[AYAR.ton]; kaydet(); toast("Kaydedildi"); render();
+};
+window.sifirla = () => { DB = ornekVeri(); AYAR = Object.assign({}, DEF_AYAR); kaydet(); toast("Demo sıfırlandı"); go("panel"); };
+
+/* ---------- yönlendirme ---------- */
+let gorunum = "panel";
+window.go = (v) => { gorunum = v; if (location.hash) history.pushState("", "", location.pathname + location.search); render(); scrollTo(0, 0); };
+function render(){
+  $("#firmaTop").textContent = AYAR.firma;
+  let h = location.hash || ""; try { h = decodeURIComponent(h); } catch(e){} const nav = $("#nav");
+  if (h.startsWith("#ekstre/")){ nav.classList.add("hide"); $("#app").innerHTML = ekstreSayfa(h.slice(8)); return; }
+  nav.classList.remove("hide");
+  nav.querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.v === gorunum));
+  $("#app").innerHTML = V[gorunum]();
+  if (gorunum === "aktar"){
+    const dr = $("#drop"), inp = $("#dosya");
+    inp.onchange = () => inp.files[0] && dosyaOku(inp.files[0]);
+    dr.ondragover = e => { e.preventDefault(); dr.classList.add("over"); };
+    dr.ondragleave = () => dr.classList.remove("over");
+    dr.ondrop = e => { e.preventDefault(); dr.classList.remove("over"); e.dataTransfer.files[0] && dosyaOku(e.dataTransfer.files[0]); };
+  }
+}
+$("#nav").addEventListener("click", e => { const b = e.target.closest("button"); if (b){ acik = null; go(b.dataset.v); } });
+addEventListener("hashchange", render);
+render();
+</script>
+</body>
+</html>
